@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Build application') {
             steps {
-                git url: 'https://gthub.com/jenkins-hero/spring-boot-api-example.git', branch: 'kaniko'
+                git url: 'https://github.com/jenkins-hero/spring-boot-api-example.git', branch: 'kaniko'
                 sh "./gradlew assemble dockerPrepare -Porg.gradle.jvmargs=-Xmx2g"
                 sh "tar c build/docker | gzip | aws s3 cp - 's3://$KANIKO_BUILD_CONTEXT_BUCKET_NAME/context.tar.gz'"
             }
