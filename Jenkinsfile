@@ -1,75 +1,55 @@
 
 pipeline {
-    agent any
-
+    agent {
+        kubernetes {
+            yaml """
+            apiVersion: v1
+            kind: Pod
+            spec:
+              containers:
+              - name: kaniko
+                image: gcr.io/kaniko-project/executor:latest
+                command:
+                - cat
+                tty: true
+                env:
+                - name: AWS_REGION
+                  value: us-east-1
+            """
+        }
+    }
     environment {
-        AWS_CREDENTIALS = 'aws-credentials'
-        ECR_REPO = '440744237104.dkr.ecr.us-east-1.amazonaws.com/rs-school/word-cloud'
-        IMAGE_TAG = "latest"
-        SONARQUBE_SCANNER = 'SonarQube Scanner'
-        KUBECONFIG = 'kubeconfig'
+        ECR_REPOSITORY = '440744237104.dkr.ecr.us-east-1.amazonaws.com/rs-school/word-cloud'
+        AWS_ACCOUNT_ID = '440744237104'
         AWS_REGION = 'us-east-1'
-        APP_REPO_URL = 'https://github.com/SerPapanin/rsschool-myword-cloud-app'
+        ECR_REPOSITORY = 'rs-school/word-cloud'
+        IMAGE_TAG = 'latest'
     }
-
     stages {
-        stage('Checkout') {
+        stage('Clone Repository') {
             steps {
-                git branch: 'main', url: env.APP_REPO_URL
+                checkout scm
             }
         }
-
-        stage('Test Docker') {
-            steps {
-                sh 'docker --version'
-            }
-        }
-
-        stage('Application Build') {
-            steps {
-                sh "docker build -t ${ECR_REPO}:${IMAGE_TAG} ."
-            }
-        }
-
-        stage('Unit Test Execution') {
-            steps {
-                sh "docker run --rm ${ECR_REPO}:${IMAGE_TAG} npm test"
-            }
-        }
-
-        stage('Security Check with SonarQube') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh "${SONARQUBE_SCANNER} -Dsonar.projectKey=my-project -Dsonar.sources=./src"
-                }
-            }
-        }
-
-        stage('Push Docker Image to ECR') {
+        stage('Build and Push Image') {
             steps {
                 script {
-                    withCredentials([aws(credentialsId: "${AWS_CREDENTIALS_ID}")]) {
-                        sh "aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin ${ECR_REPOSITORY}"
-                    }
-                    sh "docker push ${ECR_REPO}:${IMAGE_TAG}"
+                    def ecrRepo = "${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com/${env.ECR_REPOSITORY}"
+
+                    // Authenticate to ECR using the instance role
+                    sh """
+                        aws ecr get-login-password --region ${env.AWS_REGION} | \
+                        docker login --username AWS --password-stdin ${ecrRepo}
+                    """
+
+                    // Build and push using Kaniko
+                    kaniko(
+                        image: "${ecrRepo}:${env.IMAGE_TAG}",
+                        dockerfilePath: 'Dockerfile',
+                        contextPath: '.'
+                    )
                 }
             }
-        }
-
-        stage('Deploy to Kubernetes with Helm') {
-            steps {
-                script {
-                    withCredentials([file(credentialsId: "${KUBECONFIG}", variable: 'KUBECONFIG')]) {
-                        sh "helm upgrade --install my-app ./helm-chart --set image.repository=${ECR_REPOSITORY} --set image.tag=${IMAGE_TAG}"
-                    }
-                }
-            }
-        }
-    }
-
-    post {
-        always {
-            cleanWs()
         }
     }
 }
