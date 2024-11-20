@@ -3,7 +3,7 @@ pipeline {
     agent any
 
     environment {
-        AWS_CREDENTIALS_ID = 'aws-credentials'
+        AWS_CREDENTIALS = 'aws-credentials'
         ECR_REPO = '440744237104.dkr.ecr.us-east-1.amazonaws.com/rs-school/word-cloud'
         IMAGE_TAG = "latest"
         SONARQUBE_SCANNER = 'SonarQube Scanner'
