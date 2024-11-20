@@ -19,7 +19,7 @@ pipeline {
         }
     }
     environment {
-        ECR_REPOSITORY = '440744237104.dkr.ecr.us-east-1.amazonaws.com/rs-school/word-cloud'
+        //ECR_REPOSITORY = '440744237104.dkr.ecr.us-east-1.amazonaws.com/rs-school/word-cloud'
         AWS_ACCOUNT_ID = '440744237104'
         AWS_REGION = 'us-east-1'
         ECR_REPOSITORY = 'rs-school/word-cloud'
