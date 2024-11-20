@@ -7,14 +7,15 @@ pipeline {
             kind: Pod
             spec:
               containers:
+              - name: jnlp
+                workingDir: /home/jenkins
               - name: kaniko
-                image: gcr.io/kaniko-project/executor:latest
+                workingDir: /home/jenkins
+                image: gcr.io/kaniko-project/executor:debug
                 command:
-                - cat
+                - /busybox/cat
                 tty: true
-                env:
-                - name: AWS_REGION
-                  value: us-east-1
+                restartPolicy: Never
             """
         }
     }
