@@ -11,11 +11,11 @@ pipeline {
                 workingDir: /home/jenkins
               - name: kaniko
                 workingDir: /home/jenkins
-                image: gcr.io/kaniko-project/executor:debug
+                image: tkgregory/kaniko-for-ecr
                 command:
                 - /busybox/cat
                 tty: true
-                
+
             """
         }
     }
