@@ -11,9 +11,10 @@ pipeline {
                 - name: kaniko
                   image: gcr.io/kaniko-project/executor:debug
                   args:
-                  - "--dockerfile=/workspace/Dockerfile"
-                  - "--context=/workspace"
-                  - "--destination=\${AWS_ECR_REPOSITORY_URI}:\${IMAGE_TAG}"
+                  - "--dockerfile=Dockerfile"
+                  - "--context=git://github.com/SerPapanin/rsschool-myword-cloud-app.git#refs/heads/main"
+                  - "--destination=440744237104.dkr.ecr.us-east-1.amazonaws.com/rs-school/word-cloud:0.2"
+                  - "--log-level=debug"
 """
         }
     }
