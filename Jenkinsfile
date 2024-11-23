@@ -60,7 +60,7 @@ pipeline {
         container('helm') {
           withCredentials([file(credentialsId: 'k3s-config', variable: 'KUBECONFIG')]) {
             sh '''
-            kubectl get namespace wordpress || kubectl create namespace wordpress
+            # kubectl get namespace wordpress || kubectl create namespace wordpress
             helm repo add my-wp https://SerPapanin.github.io/rsschool-wp-helm/
             helm upgrade --install my-wp/wordpress --namespace wordpress --version 0.1.3 --wait
             '''
