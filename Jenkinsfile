@@ -62,8 +62,8 @@ pipeline {
             sh '''
             # kubectl get namespace wordpress || kubectl create namespace wordpress
             helm repo add my-wp https://SerPapanin.github.io/rsschool-wp-helm/
-            #helm upgrade --install my-wp wordpress --namespace wordpress --version 0.1.3 --wait
-            helm install wordpress my-wp/wordpress --version 0.1.3
+            helm upgrade --install wordpress my-wp/wordpress --namespace wordpress --version 0.1.3 --wait
+            #helm install wordpress my-wp/wordpress --version 0.1.3
             '''
           }
         }
