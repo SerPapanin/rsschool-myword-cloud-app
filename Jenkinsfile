@@ -1,5 +1,4 @@
 pipeline {
-  agent none
     environment {
         AWS_REGION = 'us-east-1' // Replace with your AWS region
         AWS_ACCOUNT_ID = '440744237104' // Replace with your AWS Account ID
@@ -41,32 +40,32 @@ pipeline {
           }
         }
       }
-            stage('Deploy') {
-            agent {
-                kubernetes {
-                    yaml """
-                    apiVersion: v1
-                    kind: Pod
-                    spec:
-                      containers:
-                      - name: helm
-                        image: alpine/helm:3.16.3
-                        command: ["cat"]
-                        tty: true
-                    """
-                }
-            }
-            steps {
-                container('helm') {
-                  withCredentials([file(credentialsId: 'k3s-config', variable: 'KUBECONFIG')]) {
-                    sh '''
-                    kubectl get namespace wordpress || kubectl create namespace wordpress
-                    helm repo add my-wp https://SerPapanin.github.io/rsschool-wp-helm/
-                    helm upgrade --install my-wp/wordpress --namespace wordpress --version 0.1.3 --wait
-                    '''
-                  }
-                }
+      stage('Deploy') {
+        agent {
+            kubernetes {
+                yaml """
+                apiVersion: v1
+                kind: Pod
+                spec:
+                  containers:
+                  - name: helm
+                    image: alpine/helm:3.16.3
+                    command: ["cat"]
+                    tty: true
+                """
             }
         }
+        steps {
+            container('helm') {
+              withCredentials([file(credentialsId: 'k3s-config', variable: 'KUBECONFIG')]) {
+                sh '''
+                kubectl get namespace wordpress || kubectl create namespace wordpress
+                helm repo add my-wp https://SerPapanin.github.io/rsschool-wp-helm/
+                helm upgrade --install my-wp/wordpress --namespace wordpress --version 0.1.3 --wait
+                '''
+              }
+            }
+        }
+    }
   }
 }
