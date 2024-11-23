@@ -1,6 +1,5 @@
 pipeline {
   agent none
-  }
     environment {
         AWS_REGION = 'us-east-1' // Replace with your AWS region
         AWS_ACCOUNT_ID = '440744237104' // Replace with your AWS Account ID
@@ -40,8 +39,8 @@ pipeline {
                   '''
               }
           }
+        }
       }
-    }
             stage('Deploy') {
             agent {
                 kubernetes {
@@ -69,4 +68,5 @@ pipeline {
                 }
             }
         }
+  }
 }
