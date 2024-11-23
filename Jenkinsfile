@@ -1,24 +1,5 @@
 pipeline {
-  agent {
-    kubernetes {
-        yaml """
-          apiVersion: v1
-          kind: Pod
-          metadata:
-            name: kaniko
-          spec:
-            containers:
-            - name: jnlp
-              workingDir: /tmp/jenkins
-            - name: kaniko
-              workingDir: /tmp/jenkins
-              image: gcr.io/kaniko-project/executor:debug
-              imagePullPolicy: Always
-              command:
-              - /busybox/cat
-              tty: true
-"""
-    }
+  agent none
   }
     environment {
         AWS_REGION = 'us-east-1' // Replace with your AWS region
@@ -29,6 +10,26 @@ pipeline {
     }
     stages {
       stage('Build and Push Docker Image') {
+        agent {
+          kubernetes {
+              yaml """
+                apiVersion: v1
+                kind: Pod
+                metadata:
+                  name: kaniko
+                spec:
+                  containers:
+                  - name: jnlp
+                    workingDir: /tmp/jenkins
+                  - name: kaniko
+                    workingDir: /tmp/jenkins
+                    image: gcr.io/kaniko-project/executor:debug
+                    imagePullPolicy: Always
+                    command:
+                    - /busybox/cat
+                    tty: true
+              """
+          }
           environment {
             PATH = "/busybox:/kaniko:$PATH"
           }
@@ -41,4 +42,31 @@ pipeline {
           }
       }
     }
+            stage('Deploy') {
+            agent {
+                kubernetes {
+                    yaml """
+                    apiVersion: v1
+                    kind: Pod
+                    spec:
+                      containers:
+                      - name: helm
+                        image: alpine/helm:3.16.3
+                        command: ["cat"]
+                        tty: true
+                    """
+                }
+            }
+            steps {
+                container('helm') {
+                  withCredentials([file(credentialsId: 'k3s-config', variable: 'KUBECONFIG')]) {
+                    sh '''
+                    kubectl get namespace wordpress || kubectl create namespace wordpress
+                    helm repo add my-wp https://SerPapanin.github.io/rsschool-wp-helm/
+                    helm upgrade --install my-wp/wordpress --namespace wordpress --version 0.1.3 --wait
+                    '''
+                  }
+                }
+            }
+        }
 }
