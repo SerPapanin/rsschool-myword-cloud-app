@@ -68,7 +68,7 @@ pipeline {
                         --set image.repository=${AWS_ECR_REPOSITORY_URI} \\
                         --set image.tag=${IMAGE_TAG} \\
                         -f ./helm/values.yaml \\
-                        --namespace my-app
+                        --namespace word-cloud
             '''
           }
         }
