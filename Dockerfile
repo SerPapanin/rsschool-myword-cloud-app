@@ -1,6 +1,6 @@
 FROM golang:1.23
 WORKDIR /word-cloud-generator
-COPY  word-cloud/ .
+COPY  word-cloud-generator/ .
 RUN  make
 
 
