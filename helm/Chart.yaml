@@ -1,0 +1,9 @@
+apiVersion: v2
+name: my-word-cloud-app
+description: A Helm chart for My word cloud app rs-school
+
+type: application
+
+version: 0.1.1
+
+appVersion: "1.0.1"
