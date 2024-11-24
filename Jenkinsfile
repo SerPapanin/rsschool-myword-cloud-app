@@ -38,7 +38,7 @@ pipeline {
               sh '''#!/busybox/sh
               ls -la /workspace
               #
-              /kaniko/executor --dockerfile=Dockerfile --context='pwd' --destination=$AWS_ECR_REPOSITORY_URI:$IMAGE_TAG --verbosity debug
+              /kaniko/executor --dockerfile=Dockerfile --destination=$AWS_ECR_REPOSITORY_URI:$IMAGE_TAG --verbosity debug
               '''
           }
         }
