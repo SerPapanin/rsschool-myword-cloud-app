@@ -36,8 +36,6 @@ pipeline {
         steps {
           container(name: 'kaniko', shell: '/busybox/sh') {
               sh '''#!/busybox/sh
-              ls -la /workspace
-              #
               /kaniko/executor --dockerfile=Dockerfile --context=/tmp/jenkins/workspace/test --destination=$AWS_ECR_REPOSITORY_URI:$IMAGE_TAG --verbosity debug
               '''
           }
@@ -63,9 +61,14 @@ pipeline {
           withCredentials([file(credentialsId: 'k3s-config', variable: 'KUBECONFIG')]) {
             sh '''
             # kubectl get namespace wordpress || kubectl create namespace wordpress
-            helm repo add my-wp https://SerPapanin.github.io/rsschool-wp-helm/
+            #helm repo add my-wp https://SerPapanin.github.io/rsschool-wp-helm/
             #helm upgrade --install wordpress my-wp/wordpress --namespace wordpress --version 0.1.3 --wait
             #helm install wordpress my-wp/wordpress --version 0.1.3
+            helm upgrade --install word-cloud-generator ./helm/ \\
+                        --set image.repository=${AWS_ECR_REPOSITORY_URI} \\
+                        --set image.tag=${IMAGE_TAG} \\
+                        -f ./helm/values.yaml \\
+                        --namespace my-app
             '''
           }
         }
