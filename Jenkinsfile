@@ -50,7 +50,7 @@ pipeline {
             spec:
               containers:
               - name: helm
-                image: alpine/helm:3.16.3
+                image: jakexks/kubectl-helm-aws:latest
                 command: ["cat"]
                 tty: true
             """
@@ -60,10 +60,7 @@ pipeline {
         container('helm') {
           withCredentials([file(credentialsId: 'k3s-config', variable: 'KUBECONFIG')]) {
             sh '''
-            # kubectl get namespace wordpress || kubectl create namespace wordpress
-            #helm repo add my-wp https://SerPapanin.github.io/rsschool-wp-helm/
-            #helm upgrade --install wordpress my-wp/wordpress --namespace wordpress --version 0.1.3 --wait
-            #helm install wordpress my-wp/wordpress --version 0.1.3
+            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 440744237104.dkr.ecr.us-east-1.amazonaws.com
             helm upgrade --install word-cloud-generator ./helm/ \\
                         --set image.repository=${AWS_ECR_REPOSITORY_URI} \\
                         --set image.tag=${IMAGE_TAG} \\
