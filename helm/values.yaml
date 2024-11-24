@@ -6,5 +6,5 @@ app:
     repository: 440744237104.dkr.ecr.us-east-1.amazonaws.com/rs-school/word-cloud
     tag: latest
   replicas: 1
-  port: 80
+  port: 8888
   nodePort: 32000
