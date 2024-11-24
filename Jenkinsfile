@@ -36,6 +36,7 @@ pipeline {
         steps {
           container(name: 'kaniko', shell: '/busybox/sh') {
               sh '''#!/busybox/sh
+              ls -la
               /kaniko/executor --dockerfile=/workspace/Dockerfile --context=/workspace --destination=$AWS_ECR_REPOSITORY_URI:$IMAGE_TAG --verbosity debug
               '''
           }
