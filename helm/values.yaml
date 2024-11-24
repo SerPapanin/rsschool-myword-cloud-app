@@ -1,7 +1,7 @@
 namespace: word-cloud
-app: word-cloud
 host: word-cloud.local
 app:
+  name: word-cloud
   image:
     repository: 440744237104.dkr.ecr.us-east-1.amazonaws.com/rs-school/word-cloud
     tag: latest
